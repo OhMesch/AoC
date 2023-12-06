@@ -10,7 +10,7 @@ import pytest
 def test_combine_maps():
     m1 = [(3, 4, 10), (19, 30, 13)]
     m2 = [(15, 7, 10), (23, 25, 15)]
-    expected = [(3, 1, 2), (15, 3, 8), (20, 10, 5), (18, 25, 5), (16, 30, 5), (16, 35, 5)]
+    expected = [(3, 4, 4), (15, 8, 7), (23, 25, 5), (19, 30, 6), (23, 36, 7)]
     my_map = sorted(b.combine_maps(m1, m2), key=lambda x: x[1])
     print(f"{my_map=}")
     for i in range(50):

@@ -17,21 +17,29 @@ def combine_maps(input_map, output_map):
         out_dest, out_src, out_len = out_set
         for in_set in input_map:
             in_dest, in_src, in_len = in_set
+            min_start = min(in_dest, out_src)
             max_start = max(in_dest, out_src)
             min_end = min(in_dest+in_len, out_src+out_len)
+            max_end = max(in_dest+in_len, out_src+out_len)
             if max_start < min_end:
-                left_set, overlap_set = sorted([in_set, out_set], key=lambda x: x[1])
-                print(f"{left_set=}")
-                print(f"{overlap_set=}")
-                left_range = ((left_set[0], left_set[1], overlap_set[1]-left_set[1]+1))
-                overlap_range = ((out_dest, max_start+1, min_end-max_start))
+                overlap_len = min_end-max_start
+                overlap = ((out_dest, out_src + in_src - in_dest, overlap_len))
+                print(f"{overlap=}")
 
-                overlap_set, right_set = [in_set, out_set] if (in_dest+in_len) < (out_src+out_len) else [out_set, in_set]
-                right_range = ((right_set[0]+min_end-max_start, overlap_set[0]+overlap_set[2], right_set[1]+right_set[2]-(overlap_set[0]+overlap_set[2])))
-                
-                combined_map.append(left_range)
-                combined_map.append(overlap_range)
-                combined_map.append(right_range)
+                left_in = ((in_dest, in_src, out_src-in_dest))
+                print(f"{left_in=}")
+                left_out = ((out_dest, out_src, in_src-out_src))
+                print(f"{left_out=}")
+
+
+                right_in = ((in_dest+overlap_len, in_src+overlap_len, in_len-overlap_len))
+                right_out = ((out_dest+overlap_len, out_src+overlap_len, out_len-overlap_len))
+                print(f"{right_in=}")
+                print(f"{right_out=}")
+
+                for new_range in [left_in, left_out, overlap, right_in, right_out]:
+                    if new_range[2] > 0:
+                        combined_map.append(new_range)
 
                 if in_set in unaccounted_for:
                     unaccounted_for.remove(in_set)
