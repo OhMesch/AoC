@@ -10,32 +10,23 @@ def organize_map(map_name, data):
 def combine_maps(input_map, output_map):
     combined_map = []
     unaccounted_for = set(input_map+output_map)
-    print(f"{input_map=}")
-    print(f"{output_map=}")
     
     for out_set in output_map:
         out_dest, out_src, out_len = out_set
         for in_set in input_map:
             in_dest, in_src, in_len = in_set
-            min_start = min(in_dest, out_src)
             max_start = max(in_dest, out_src)
             min_end = min(in_dest+in_len, out_src+out_len)
             max_end = max(in_dest+in_len, out_src+out_len)
             if max_start < min_end:
                 overlap_len = min_end-max_start
                 overlap = ((out_dest, out_src + in_src - in_dest, overlap_len))
-                print(f"{overlap=}")
 
                 left_in = ((in_dest, in_src, out_src-in_dest))
-                print(f"{left_in=}")
                 left_out = ((out_dest, out_src, in_src-out_src))
-                print(f"{left_out=}")
 
-
-                right_in = ((in_dest+overlap_len, in_src+overlap_len, in_len-overlap_len))
-                right_out = ((out_dest+overlap_len, out_src+overlap_len, out_len-overlap_len))
-                print(f"{right_in=}")
-                print(f"{right_out=}")
+                right_in = ((in_dest+overlap_len, in_src+overlap_len, max_end-(out_src+out_len)+1))
+                right_out = ((out_dest+overlap_len, out_src+overlap_len, (out_src+out_len)-(in_src+in_len)+1))
 
                 for new_range in [left_in, left_out, overlap, right_in, right_out]:
                     if new_range[2] > 0:
@@ -56,6 +47,13 @@ def map_lookup(map, value):
         if source_start <= value < source_start + length:
             return dest_start + value - source_start
     return value
+
+def map_lookup_with_skips(map, value):
+    # I mean I should binary but...
+    for dest_start, source_start, length in map:
+        if source_start <= value < source_start + length:
+            return dest_start + value - source_start, source_start+length-value
+    return value, None
 
 def generateSolution(filename):
     with open(filename) as f:
@@ -79,8 +77,11 @@ def generateSolution(filename):
 
     lowest_seen = float("inf")
     for s_base, s_range in zip(seeds[::2], seeds[1::2]):
-        for s_index in range(s_range):
-            lowest_seen = min(lowest_seen, map_lookup(seed2location, s_base+s_index))
+        s_index = 0
+        while s_index < s_range:
+            lookup, skip_to = map_lookup_with_skips(seed2location, s_base+s_index)
+            lowest_seen = min(lowest_seen, lookup)
+            s_index += skip_to if skip_to else 1
 
     return lowest_seen
 
