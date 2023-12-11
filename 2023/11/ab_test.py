@@ -1,8 +1,12 @@
-import a
-# import b
+import ab
+import graph
 
 import pytest
-@pytest.mark.parametrize("m, expected", [(a, 374)])
 
-def test_a_solution_generation(m, expected):
-    assert m.generateSolution("ab_test.dat") == expected
+@pytest.mark.parametrize("expansion, expected", [(2, 374), (10, 1030), (100, 8410)])
+def test_a_solution_generation(expansion, expected):
+    assert ab.generateSolution("ab_test.dat", expansion) == expected
+
+@pytest.mark.parametrize("expansion, expected", [(2, 374), (10, 1030), (100, 8410)])
+def test_b_solution_generation(expansion, expected):
+    assert graph.generateSolution("ab_test.dat", expansion) == expected
