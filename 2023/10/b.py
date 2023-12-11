@@ -47,13 +47,12 @@ def getInsidePoints(pipe_map, loc, d):
     pipe_type = pipe_map[y][x]
 
     inside_p = []
-    # print(f"pipe_type: {pipe_type}, loc: {loc}, d: {d}")
     for modification in inside_point_map[pipe_type](d):
         inside_p.append((x + modification[0], y + modification[1]))
     
     return inside_p
 
-def calcuateDirection(curr_loc, next_loc):
+def calculateDirection(curr_loc, next_loc):
     if curr_loc[0] == next_loc[0]:
         return "N" if curr_loc[1] > next_loc[1] else "S"
     else:
@@ -73,9 +72,7 @@ def chartPipes(pipe_map, start):
         all_next_loc = [x for x in adjs if x not in chart]
         next_loc = all_next_loc[0] if all_next_loc else start
 
-        # print(f"curr_loc: {curr_loc}, next_loc: {next_loc}")
-
-        direction = calcuateDirection(curr_loc, next_loc)
+        direction = calculateDirection(curr_loc, next_loc)
         [inside_points.add(p) for p in getInsidePoints(pipe_map, curr_loc, direction)]
 
         curr_loc = next_loc
@@ -86,6 +83,7 @@ def createGroupMappingsForEmptySpots(simple_map, known_inside):
     seen = set()
     groups = {}
     curr_group = 0
+    reverse_inside_flag = False
     for y in range(len(simple_map)):
         for x in range(len(simple_map[y])):
             if (x,y) not in seen and simple_map[y][x] == ".":
@@ -100,6 +98,8 @@ def createGroupMappingsForEmptySpots(simple_map, known_inside):
                     curr_group_members.add(curr_node)
                     if curr_node in known_inside:
                         is_inside = True
+                        if curr_node[0] == 0 or curr_node[1] == 0:
+                            reverse_inside_flag = True
                     if curr_node[0] > 0:
                         nodes_attached.append(getWest(curr_node))
                     if curr_node[0] < len(simple_map[y]) - 1:
@@ -112,6 +112,9 @@ def createGroupMappingsForEmptySpots(simple_map, known_inside):
                 groups[curr_group] = (curr_group_members, is_inside)
                 curr_group += 1
 
+    if reverse_inside_flag:
+        for k,v in groups.items():
+            groups[k] = (v[0], not v[1])
     return groups
 
 def generateSolution(filename):
@@ -128,19 +131,17 @@ def generateSolution(filename):
                 break
 
     chart, inside_p = chartPipes(pipe_map, start_loc)
-    simplied_map = [[x if (i,y_index) in chart else "." for i,x in enumerate(pipe_map[y_index])] for y_index in range(len(pipe_map))]
-    simplied_map = ["".join(l).translate(str.maketrans("-|F7LJ", "─│┌┐└┘")) for l in simplied_map]
+    simplified_map = [[x if (i,y_index) in chart else "." for i,x in enumerate(pipe_map[y_index])] for y_index in range(len(pipe_map))]
+    unicode_map = ["".join(l).translate(str.maketrans("-|F7LJ", "─│┌┐└┘")) for l in simplified_map]
     
-    print("\nVISUAL")
-    groups = createGroupMappingsForEmptySpots(simplied_map, inside_p) 
-
-    print(simplied_map)
-
-    for y in range(len(simplied_map)):
+    groups = createGroupMappingsForEmptySpots(simplified_map, inside_p) 
+    
+    print("\nVISUALIZATION:")
+    for y in range(len(unicode_map)):
         curr_line = []
-        for x in range(len(simplied_map[y])):
-            if simplied_map[y][x] != ".":
-                curr_line.append(simplied_map[y][x])
+        for x in range(len(unicode_map[y])):
+            if unicode_map[y][x] != ".":
+                curr_line.append(unicode_map[y][x])
             else:
                 for group in groups.values():
                     if (x,y) in group[0] and group[1]:
@@ -150,9 +151,8 @@ def generateSolution(filename):
                         curr_line.append("O")
                         break
         print("".join(curr_line))
-    print(f"Groups: {[len(v[0]) for v in groups.values() if v[1]]}")
     
-    return sum([len(x[0]) for x in groups.values() if not x[1]])
+    return sum([len(x[0]) for x in groups.values() if x[1]])
     
 if __name__ == "__main__":
     print(generateSolution("ab.dat"))
