@@ -1,36 +1,5 @@
 from a import getNorth, getSouth, getEast, getWest, getPipeAdjacencies, getStartAdjacencies
 
-# def r180(d):
-#     return {"N": "S", "E": "W", "S": "N", "W": "E"}[d]
-
-# to_from_direction_conversion = {
-#     ("F", "-"): lambda d: {"N": "E", "W": "S"}[d],
-#     ("F", "|"): lambda d: {"W": "S", "N": "E"}[d],
-#     ("F", "7"): lambda d: {d: r180(d)},
-#     ("F", "L"): lambda d: {d: r180(d)},
-#     ("F", "J"): lambda d: {d: d},
-
-#     ("7", "-"): lambda d: {"N": "W", "E": "S"}[d],
-#     ("7", "|"): lambda d: {"E": "S", "N": "W"}[d],
-#     ("7", "L"): lambda d: {d: d},
-#     ("7", "J"): lambda d: {d: r180(d)},
-
-#     {"L", "-"}: lambda d: {"S": "E", "W": "N"}[d],
-#     {"L", "|"}: lambda d: {"W": "N", "S": "E"}[d],
-#     {"L", "J"}: lambda d: {d: r180(d)},
-
-#     {"J", "-"}: lambda d: {"S": "W", "E": "N"}[d],
-#     {"J", "|"}: lambda d: {"E": "N", "S": "W"}[d],
-
-#     ("-", "-"): lambda d: {d: d},
-#     ("|", "|"): lambda d: {d: d},
-# }
-
-# for k,v in to_from_direction_conversion.items():
-#     s, e = k
-#     if (e, s) not in to_from_direction_conversion:
-#         to_from_direction_conversion[(e, s)] = v
-
 inside_point_map = {
     "F": lambda d: {"E": [(1, 1)], "S": [(0, -1), (-1, 0)]}[d],
     '-': lambda d: {"E": [(0, 1)], "W": [(0, -1)]}[d],
