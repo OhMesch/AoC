@@ -44,8 +44,11 @@ def dijkstra_till_find_all_goals(adj, start, goals):
         for next_node, dist in [(node, dist) for node, dist in enumerate(adj[curr_node]) if dist != float('inf') and node not in visited]:
             heappush(to_explore, (curr_dist + dist, next_node))
 
-    return adj
-
+def floyd_warshall(adj):
+    for k in range(len(adj)):
+        for i in range(len(adj)):
+            for j in range(len(adj)):
+                adj[i,j] = min(adj[i,j], adj[i,k] + adj[k,j])
 
 def generateSolution(filename, expansion=1000000):
     with open(filename, "r") as f:
@@ -60,11 +63,16 @@ def generateSolution(filename, expansion=1000000):
     galaxies_i = np.where(space_grid == "#")
     galaxies = [xy2i(x,y,space_grid) for x,y in zip(galaxies_i[1], galaxies_i[0])]
 
+    # floyd_warshall(adj_matrix, galaxies)
+    # print(adj_matrix)
+    # galaxy_shortest_paths = adj_matrix[galaxies,:][:,galaxies]
+    # return int(np.sum(np.triu(galaxy_shortest_paths)))
+
     count = 0
     for g in galaxies:
         count += 1
         print("\nDijkstra Round: ", count)
-        adj_matrix = dijkstra_till_find_all_goals(adj_matrix, g, galaxies)
+        dijkstra_till_find_all_goals(adj_matrix, g, galaxies)
         galaxy_shortest_paths = adj_matrix[galaxies,:][:,galaxies]
         print(galaxy_shortest_paths)
 
