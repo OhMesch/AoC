@@ -1,6 +1,5 @@
 import re
 from functools import cache
-import a
 
 def simplify(parts, rules):
     parts = re.sub(r"^\.*", "", parts)
@@ -16,12 +15,10 @@ def simplify(parts, rules):
         rules = tuple(rules[:-1])
 
     while rules and ((simple_parts := re.sub(r"^#[^.]{" + str(rules[0]-1) + r"}[^#]", ".", parts)) != parts):
-        # print("\n",parts, rules, simple_parts, tuple(rules[1:]))
         parts = simple_parts
         rules = tuple(rules[1:])
 
     while rules and ((simple_parts := re.sub(r"[^#][^.]{" + str(rules[-1]-1) + r"}#$", ".", parts)) != parts):
-        # print("\n",parts, rules, simple_parts, tuple(rules[:-1]))
         parts = simple_parts
         rules = tuple(rules[:-1])
 
@@ -57,9 +54,6 @@ def isPossible(parts, rules):
 @cache
 def permutatePossible(parts, rules, d=0):
     parts, rules = simplify(parts, rules)
-    # if d==0:
-    #     print()
-    # print(f"String: '{parts}' w/ Rules {rules} - Depth: {d}")
     if rules and '?' in parts:
         size = rules[0]
 
@@ -72,12 +66,8 @@ def permutatePossible(parts, rules, d=0):
                 # print("\033[95m" + parts[:i].replace("?",".")+f"\033[95m{fill}\033[0m" + parts[i+len(fill):])
                 all_possibles.append(parts[:i].replace("?",".")+parts[i+len(fill):])
         
-        # print("Recalling:")
-        # [print(p, tuple(rules[1:])) for p in all_possibles if (not rules[1:] or isPossible(p, tuple(rules[1:])))]
-        # sums = [permutatePossible(p, tuple(rules[1:]),d=d+1) for p in all_possibles if (not rules[1:] or isPossible(p, tuple(rules[1:])))]
         return sum([permutatePossible(p, tuple(rules[1:]),d=d+1) for p in all_possibles if (not rules[1:] or isPossible(p, tuple(rules[1:])))])
     else:
-        # print("COMPLETE: ", parts, rules, "=>", 1 if tuple([len(d) for d in re.findall(r'#+', parts)]) == rules else 0, "\n")
         return 1 if tuple([len(d) for d in re.findall(r'#+', parts)]) == rules else 0
 
 total_p_list = []
@@ -104,8 +94,6 @@ def generateSolution(filename):
         print("%d/%d: %s -> %d" % (i, len(lines), line, arrangement))
         running_sum+=arrangement
 
-
-    # ans = sum([bruteForce(line) for line in lines])
     print(permutatePossible.cache_info())
     return running_sum
     
