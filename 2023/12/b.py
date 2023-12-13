@@ -9,18 +9,11 @@ def generateSolution(filename):
     for i,line in enumerate(lines):
         parts, rules = line.split(" ")
 
-        fifth_arrangement = 0
-        first_arrangement = bruteForce(line)
+        duplicate_line = "%s %s" % ('?'.join([parts for _ in range(5)]), (rules+',')*(4)+rules)
 
-        if first_arrangement:
-            duplicate_line = "%s %s" % ('?'.join([parts for _ in range(2)]), (rules+',')*(1)+rules)
-            second_arrangement = bruteForce(duplicate_line)
-            fifth_arrangement = first_arrangement*(second_arrangement/first_arrangement)**4 if second_arrangement else 0
-
-        # arrangements = bruteForce(new_line)
-        print("%d/%d: %s -> %d | %d | %d" % (i, len(lines), line, first_arrangement, second_arrangement, fifth_arrangement))
-        # # print(i + " " + len(lines)+": " + new_line)
-        running_sum+=fifth_arrangement
+        arrangement = bruteForce(duplicate_line)
+        print("%d/%d: %s -> %d" % (i, len(lines), line, arrangement))
+        running_sum+=arrangement
 
     return running_sum
     
