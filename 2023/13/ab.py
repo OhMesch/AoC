@@ -16,7 +16,7 @@ def parseInputFile(filename):
 
     return mirror_matrix
 
-def detectHorizontalMirror(mirror, required_smudges=1):
+def detectHorizontalMirror(mirror, required_smudges):
     for i in range(0, len(mirror)-1):
         segment_len = min(i+1, len(mirror)-i-1)
         low_idx = i-segment_len+1
