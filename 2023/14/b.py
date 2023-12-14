@@ -16,8 +16,7 @@ def shiftUp(rock_grid):
                 shift_idx.append(y)
             elif rock_grid[y][x] == "#":
                 shift_idx.clear()
-            else:
-                if len(shift_idx):
+            elif len(shift_idx):
                     shifted_rock_grid[shift_idx.popleft()][x] = "O"
                     shifted_rock_grid[y][x] = "."
                     shift_idx.append(y)
