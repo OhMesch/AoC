@@ -1,16 +1,6 @@
-import re
-import numpy as np
-
 def parseInputFile(filename):
     with open(filename, "r") as f:
-        # return([[(d, int(dist), color) for d, dist, color in l.split()] for l in f.readlines()])
-        return([(dirc, int(dist), c) for dirc, dist, c in [l.split() for l in f.readlines()]])
-
-    
-def printGrid(grid):
-    print()
-    for row in grid:
-        print("".join(row))
+        return([(dirc, int(dist)) for dirc, dist, _ in [l.split() for l in f.readlines()]])
 
 def printColorGrid(grid):
     print()
@@ -27,6 +17,23 @@ def printColorGrid(grid):
                 curr_row.append(c)
         print("".join(curr_row))
 
+def floodFill(starting_point, grid):
+        fill = set()
+        to_explore = [starting_point]
+        while len(to_explore) > 0:
+            curr_point = to_explore.pop()
+            
+            if curr_point in fill:
+                continue
+            fill.add(curr_point)
+            
+            x, y = curr_point
+            for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+                if 0 <= x + dx < len(grid[0]) and 0 <= y + dy < len(grid):
+                    if grid[y+dy][x+dx] == ".":
+                        to_explore.append((x+dx, y+dy))
+        return fill
+
 direction_map = {
     "U": lambda x, y: (x, y-1),
     "D": lambda x, y: (x, y+1),
@@ -35,13 +42,11 @@ direction_map = {
 
 }
 def buildDigGrid(dig_instructions):
-    print(dig_instructions)
-
     curr_v_dist = 0
     v_dims = [0, 0]
     curr_h_dist = 0
     h_dims = [0, 0]
-    for direction, distance, _ in dig_instructions:
+    for direction, distance in dig_instructions:
         if direction == "U":
             curr_v_dist -= distance
             v_dims[0] = min(v_dims[0], curr_v_dist)
@@ -60,65 +65,32 @@ def buildDigGrid(dig_instructions):
     curr_x, curr_y = (0, 0)
     curr_x, curr_y = (-h_dims[0], -v_dims[0])
     dig_grid[curr_y][curr_x] = "#"
-    for direction, distance, _ in dig_instructions:
+    for direction, distance in dig_instructions:
         for _ in range(distance):
             curr_x, curr_y = direction_map[direction](curr_x, curr_y)
-            print(f"({curr_x}, {curr_y}) -> {direction, distance} -> {len(dig_grid[0]), len(dig_grid)} w/ ranges (x, y): {h_dims, v_dims}")
             dig_grid[curr_y][curr_x] = "#"
-
-    #loop over all points in grid where x or y is 0
     
+    flood_points = []
+    for y in range(len(dig_grid)):
+        flood_points.append((0, y))
+        flood_points.append((len(dig_grid[y])-1, y))
+    for x in range(len(dig_grid[0])):
+        flood_points.append((x, 0))
+        flood_points.append((x, (len(dig_grid)-1)))
+
     outside_points = set()
-    def floodFill(starting_point, grid):
-        fill = set(starting_point)
-        
+    for point in flood_points:
+        if point not in outside_points and dig_grid[point[1]][point[0]] == '.':
+            outside_points = outside_points.union(floodFill(point, dig_grid))
+
+    printColorGrid(dig_grid)
 
     for y in range(len(dig_grid)):
-        if dig_grid[y][0] == ".":
-            outside_points.union(floodFill((0, y), dig_grid))
-        if dig_grid[y][-1] == ".":
-            outside_points.union(floodFill((0, y), dig_grid))
-    for x in range(len(dig_grid[0])):
-        if dig_grid[0][x] == ".":
-            outside_points.union(floodFill((x, 0), dig_grid))
-        if dig_grid[-1][x] == ".":
-            outside_points.union(floodFill((x, 0), dig_grid))
-        
-        
+        for x in range(len(dig_grid[0])):
+            if (x, y) not in outside_points and dig_grid[y][x] == '.':
+                dig_grid[y][x] = "@"
 
-    # # dig_grid = np.rot90(dig_grid)
-
-    # printGrid(dig_grid)
-    # dig_grid = ["".join(row) for row in dig_grid]
-
-    # print()
-    # rx = re.compile(r"(?<=#)[.]+(?=#)")
-    # # match_count = 0
-    # # def replaceEveryOther(match):
-    # #     nonlocal match_count
-    # #     match_count += 1
-    # #     if match_count % 2 == 1:
-    # #         return r'@'*len(match.group())
-    # #     else:
-    # #         return match.group()
-    
-    # for y in range(len(dig_grid)):
-    #     # match_count = 0
-    #     dig_grid[y] = rx.sub(lambda x: r'/'*len(x.group()), dig_grid[y])
-
-    # printColorGrid(dig_grid)
-
-    # dig_grid = np.rot90([list(row) for row in dig_grid])
-    # dig_grid = ["".join(row) for row in dig_grid]
-
-    # rx = re.compile(r"(?<=#)[/]+(?=#)")
-    # for y in range(len(dig_grid)):
-    #     dig_grid[y] = rx.sub(lambda x: r'@'*len(x.group()), dig_grid[y])
-    
-    # dig_grid = np.rot90([list(row) for row in dig_grid], k=-1)
-    # dig_grid = ["".join(row) for row in dig_grid]
-    
-    # printColorGrid(dig_grid)
+    printColorGrid(dig_grid)
 
     return dig_grid
 

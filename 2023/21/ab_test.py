@@ -9,7 +9,6 @@ def test_a_example():
 def test_a_regression():
     assert a.generateSolution("ab.dat", 64) == 3658
 
-
 @pytest.mark.parametrize("steps, expected", [
     (6, 16),
     (10, 50),
@@ -21,3 +20,6 @@ def test_a_regression():
 ])
 def test_b_example(steps, expected):
     assert b.generateSolution("ab_test.dat", steps) == expected
+
+def test_b_regression():
+    assert b.generateSolution("ab.dat") == 608193767979991
